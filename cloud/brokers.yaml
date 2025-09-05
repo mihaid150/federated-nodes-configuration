@@ -1,0 +1,163 @@
+# --- RabbitMQ (cloud) ---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rabbitmq-data
+  namespace: cloud
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: local-path
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq
+  namespace: cloud
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbitmq
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      nodeSelector:
+        tier: cloud
+      containers:
+        - name: rabbitmq
+          image: rabbitmq:3-management
+          ports:
+            - containerPort: 5672
+            - containerPort: 15672
+          env:
+            - { name: RABBITMQ_DEFAULT_USER, value: "guest" }
+            - { name: RABBITMQ_DEFAULT_PASS, value: "guest" }
+            - { name: RABBITMQ_DEFAULT_VHOST, value: "/" }
+          readinessProbe:
+            tcpSocket: { port: 5672 }
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            tcpSocket: { port: 5672 }
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          volumeMounts:
+            - { name: data, mountPath: /var/lib/rabbitmq }
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: rabbitmq-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+  namespace: cloud
+spec:
+  selector:
+    app: rabbitmq
+  ports:
+    - { name: amqp, port: 5672, targetPort: 5672 }
+    - { name: mgmt, port: 15672, targetPort: 15672 }
+  type: ClusterIP
+
+# --- Mosquitto (cloud) ---
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mosquitto-conf
+  namespace: cloud
+data:
+  mosquitto.conf: |
+    listener 1883 0.0.0.0
+    allow_anonymous true
+    persistence true
+    persistence_location /mosquitto/data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mosquitto-data
+  namespace: cloud
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 256Mi
+  storageClassName: local-path
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mosquitto-log
+  namespace: cloud
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 128Mi
+  storageClassName: local-path
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mqtt
+  namespace: cloud
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mqtt
+  template:
+    metadata:
+      labels:
+        app: mqtt
+    spec:
+      nodeSelector:
+        tier: cloud
+      containers:
+        - name: mosquitto
+          image: eclipse-mosquitto:2
+          ports:
+            - containerPort: 1883
+          readinessProbe:
+            tcpSocket: { port: 1883 }
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            tcpSocket: { port: 1883 }
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          volumeMounts:
+            - { name: cfg,  mountPath: /mosquitto/config/mosquitto.conf, subPath: mosquitto.conf }
+            - { name: data, mountPath: /mosquitto/data }
+            - { name: log,  mountPath: /mosquitto/log }
+      volumes:
+        - name: cfg
+          configMap:
+            name: mosquitto-conf
+        - name: data
+          persistentVolumeClaim:
+            claimName: mosquitto-data
+        - name: log
+          persistentVolumeClaim:
+            claimName: mosquitto-log
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mqtt
+  namespace: cloud
+spec:
+  selector:
+    app: mqtt
+  ports:
+    - { name: mqtt, port: 1883, targetPort: 1883 }
+  type: ClusterIP
+

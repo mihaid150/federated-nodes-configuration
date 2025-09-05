@@ -1,0 +1,87 @@
+# ConfigMap with cloud env
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloud-env
+  namespace: cloud
+data:
+  CLOUD_RABBITMQ_HOST: rabbitmq.cloud.svc.cluster.local
+  CLOUD_MQTT_HOST: mqtt.cloud.svc.cluster.local
+  CLOUD_MQTT_PORT: "1883"
+  APP_HOST_PORT: "8081"
+---
+# PV for /app/models
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: cloud-models-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ""             # static PV/PVC binding
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /var/lib/fedgrid/cloud/models
+  # (Optional) pin the PV to the 'cloud' node
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values: ["cloud"]
+---
+# PVC for /app/models
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cloud-models-pvc
+  namespace: cloud
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: ""
+  volumeName: cloud-models-pv
+---
+# PV for /app/status
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: cloud-status-pv
+spec:
+  capacity:
+    storage: 128Mi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ""
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /var/lib/fedgrid/cloud/status
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values: ["cloud"]
+---
+# PVC for /app/status
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cloud-status-pvc
+  namespace: cloud
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 128Mi
+  storageClassName: ""
+  volumeName: cloud-status-pv
+

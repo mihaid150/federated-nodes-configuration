@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: edge1-fog3-env
+  namespace: edge
+data:
+  # adjust to your in-cluster broker services (or external IPs if you aren’t moving brokers yet)
+  FOG_MQTT_HOST: mqtt.fog3.svc.cluster.local
+  FOG_MQTT_PORT: "1883"
+  FOG_RABBITMQ_HOST: rabbitmq.fog3.svc.cluster.local
+  APP_HOST_PORT: "8081"
+

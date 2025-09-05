@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fog2-env
+  namespace: fog2
+data:
+  FOG_HOST: fog2
+  CLOUD_HOST: cloud-app.cloud.svc.cluster.local
+  FOG_RABBITMQ_HOST: rabbitmq.fog2.svc.cluster.local
+  CLOUD_RABBITMQ_HOST: rabbitmq.cloud.svc.cluster.local
+  FOG_MQTT_HOST: mqtt.fog2.svc.cluster.local
+  FOG_MQTT_PORT: "1883"
+  APP_HOST_PORT: "8081"
+  CLOUD_MQTT_HOST: mqtt.cloud.svc.cluster.local
+  CLOUD_MQTT_PORT: "1883"
+
+---
+# persistent folders for fog app
+apiVersion: v1
+kind: PersistentVolume
+metadata: { name: fog2-models-pv }
+spec:
+  capacity: { storage: 1Gi }
+  accessModes: ["ReadWriteOnce"]
+  storageClassName: ""
+  hostPath: { path: /var/lib/fedgrid/fog2/models }
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: fog2-models-pvc
+  namespace: fog2
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources: { requests: { storage: 1Gi } }
+  storageClassName: ""
+  volumeName: fog2-models-pv
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata: { name: fog2-outbox-pv }
+spec:
+  capacity: { storage: 256Mi }
+  accessModes: ["ReadWriteOnce"]
+  storageClassName: ""
+  hostPath: { path: /var/lib/fedgrid/fog2/outbox }
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: fog2-outbox-pvc
+  namespace: fog2
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources: { requests: { storage: 256Mi } }
+  storageClassName: ""
+  volumeName: fog2-outbox-pv
+

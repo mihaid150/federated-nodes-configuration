@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloud-app
+  namespace: cloud
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: cloud-app }
+  template:
+    metadata:
+      labels: { app: cloud-app }
+    spec:
+      nodeSelector:
+        tier: cloud
+      imagePullSecrets:
+        - name: regcred
+      containers:
+        - name: app
+          image: docker.io/mipeda150/fedgrid-cloud:latest
+          ports:
+            - containerPort: 8081
+          envFrom:
+            - configMapRef: { name: cloud-env }
+          volumeMounts:
+            - { name: models, mountPath: /app/models }
+            - { name: status, mountPath: /app/status }
+            - { name: host-sys, mountPath: /host_sys, readOnly: true }
+      volumes:
+        - name: models
+          persistentVolumeClaim: { claimName: cloud-models-pvc }
+        - name: status
+          persistentVolumeClaim: { claimName: cloud-status-pvc }
+        - name: host-sys
+          hostPath:
+            path: /sys
+            type: Directory
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloud-app
+  namespace: cloud
+spec:
+  selector: { app: cloud-app }
+  ports:
+    - { name: http, port: 8081, targetPort: 8081 }
+  type: ClusterIP
+

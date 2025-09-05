@@ -1,0 +1,100 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: edge-ws
+  namespace: edge
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+  - host: edge1-fog1.local.lan
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: edge1-fog1
+            port:
+              number: 8081
+  - host: edge1-fog2.local.lan
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: edge1-fog2
+            port:
+              number: 8081
+  - host: edge1-fog3.local.lan
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: edge1-fog3
+            port:
+              number: 8081
+  - host: edge2-fog1.local.lan
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: edge2-fog1
+            port:
+              number: 8081
+  - host: edge2-fog2.local.lan
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: edge2-fog2
+            port:
+              number: 8081
+  - host: edge2-fog3.local.lan
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: edge2-fog3
+            port:
+              number: 8081
+  - host: edge3-fog1.local.lan
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: edge3-fog1
+            port:
+              number: 8081
+  - host: edge3-fog2.local.lan
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: edge3-fog2
+            port:
+              number: 8081
+  - host: edge3-fog3.local.lan
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: edge3-fog3
+            port:
+              number: 8081
+

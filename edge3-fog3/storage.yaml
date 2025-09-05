@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: edge3-fog3-input-pv
+spec:
+  capacity: { storage: 10Mi }
+  accessModes: ["ReadWriteOnce"]
+  storageClassName: ""
+  hostPath:
+    path: /var/lib/fedgrid/input/edge3-fog3
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: edge3-fog3-input-pvc
+  namespace: edge
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources: { requests: { storage: 10Mi } }
+  storageClassName: ""
+  volumeName: edge3-fog3-input-pv
+

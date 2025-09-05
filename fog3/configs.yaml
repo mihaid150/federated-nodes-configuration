@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fog3-env
+  namespace: fog3
+data:
+  FOG_HOST: fog3
+  CLOUD_HOST: cloud-app.cloud.svc.cluster.local
+  FOG_RABBITMQ_HOST: rabbitmq.fog3.svc.cluster.local
+  CLOUD_RABBITMQ_HOST: rabbitmq.cloud.svc.cluster.local
+  FOG_MQTT_HOST: mqtt.fog3.svc.cluster.local
+  FOG_MQTT_PORT: "1883"
+  APP_HOST_PORT: "8081"
+  CLOUD_MQTT_HOST: mqtt.cloud.svc.cluster.local
+  CLOUD_MQTT_PORT: "1883"
+
+---
+# persistent folders for fog app
+apiVersion: v1
+kind: PersistentVolume
+metadata: { name: fog3-models-pv }
+spec:
+  capacity: { storage: 1Gi }
+  accessModes: ["ReadWriteOnce"]
+  storageClassName: ""
+  hostPath: { path: /var/lib/fedgrid/fog3/models }
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: fog3-models-pvc
+  namespace: fog3
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources: { requests: { storage: 1Gi } }
+  storageClassName: ""
+  volumeName: fog3-models-pv
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata: { name: fog3-outbox-pv }
+spec:
+  capacity: { storage: 256Mi }
+  accessModes: ["ReadWriteOnce"]
+  storageClassName: ""
+  hostPath: { path: /var/lib/fedgrid/fog3/outbox }
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: fog3-outbox-pvc
+  namespace: fog3
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources: { requests: { storage: 256Mi } }
+  storageClassName: ""
+  volumeName: fog3-outbox-pv
+

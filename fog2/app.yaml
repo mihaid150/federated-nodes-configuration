@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: fog-app, namespace: fog2 }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: fog-app } }
+  template:
+    metadata: { labels: { app: fog-app } }
+    spec:
+      nodeSelector: { role: fog2 }
+      imagePullSecrets: [ { name: regcred } ]
+      securityContext: { runAsUser: 1000, runAsGroup: 1000, fsGroup: 1000 }
+      containers:
+        - name: app
+          image: docker.io/mipeda150/fedgrid-fog:latest
+          ports: [ { containerPort: 8081 } ]
+          envFrom: [ { configMapRef: { name: fog2-env } } ]
+          volumeMounts:
+            - { name: models, mountPath: /app/models }
+            - { name: outbox, mountPath: /app/models/outbox }
+            - { name: host-sys, mountPath: /host_sys, readOnly: true }
+          readinessProbe:
+            tcpSocket: { port: 8081 }
+            initialDelaySeconds: 10
+            periodSeconds: 5
+      volumes:
+        - { name: models, persistentVolumeClaim: { claimName: fog2-models-pvc } }
+        - { name: outbox, persistentVolumeClaim: { claimName: fog2-outbox-pvc } }
+        - name: host-sys
+          hostPath:
+            path: /sys
+            type: Directory
+---
+apiVersion: v1
+kind: Service
+metadata: { name: fog-app, namespace: fog2 }
+spec:
+  selector: { app: fog-app }
+  ports: [ { name: http, port: 8081, targetPort: 8081 } ]
+
