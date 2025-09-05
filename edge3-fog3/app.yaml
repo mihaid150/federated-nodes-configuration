@@ -21,6 +21,20 @@ spec:
         runAsGroup: 1000
         fsGroup: 1000
       initContainers:
+        - name: seed-input-file
+          image: busybox:1.36
+          securityContext:
+            runAsUser: 0
+          command:
+            - sh
+            - -c
+            - >
+              set -e;
+              if [ -d /mnt/input_data.csv ]; then rm -rf /mnt/input_data.csv; fi;
+              [ -f /mnt/input_data.csv ] || install -m 0644 -o 1000 -g 1000 /dev/null /mnt/input_data.csv
+          volumeMounts:
+            - name: input
+              mountPath: /mnt
         - name: fix-perms-models
           image: busybox:1.36
           securityContext:
