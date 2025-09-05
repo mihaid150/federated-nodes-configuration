@@ -14,6 +14,12 @@ data:
   CLOUD_MQTT_HOST: mqtt.cloud.svc.cluster.local
   CLOUD_MQTT_PORT: "1883"
 
+  FOG_PURGE_AMQP_ON_BOOT: "true"                # purge cloud_fanout_for_fog1 at start
+  FOG_PURGE_EDGE_MODELS_ON_BOOT: "true"         # purge edge_to_fog_models at start
+  FOG_PURGE_MQTT_RETAINED_ON_BOOT: "true"       # clear all fog/<edge>/command retained
+  FOG_IGNORE_CLOUD_RETAINED_SECS: "10"          # ignore retained cloud cmd for first 10s
+  FOG_MQTT_CLEAN_SESSION: "false"               # optional; set "true" to avoid queued msgs
+
 ---
 # persistent folders for fog app
 apiVersion: v1
