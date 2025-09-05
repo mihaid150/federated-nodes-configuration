@@ -5,22 +5,34 @@ metadata:
   namespace: edge
 spec:
   replicas: 1
-  selector: { matchLabels: { app: edge3-fog1 } }
+  selector:
+    matchLabels: { app: edge3-fog1 }
   template:
-    metadata: { labels: { app: edge3-fog1 } }
+    metadata:
+      labels: { app: edge3-fog1 }
     spec:
       nodeSelector:
         tier: cloud
         logical-edge: edge3-fog1
       imagePullSecrets: [ { name: regcred } ]
       securityContext: { runAsUser: 1000, runAsGroup: 1000, fsGroup: 1000 }
+
       initContainers:
         - name: fix-perms-models
           image: busybox:1.36
-          command: [ "sh","-c","mkdir -p /app/models && chown -R 1000:1000 /app/models && chmod -R ug+rwX /app/models" ]
+          securityContext:
+            runAsUser: 0   # ensure we can chown/chmod the mounted path
+          command:
+            - sh
+            - -c
+            - >
+              mkdir -p /app/models &&
+              chown -R 1000:1000 /app/models &&
+              chmod -R ug+rwX /app/models
           volumeMounts:
             - name: models
               mountPath: /app/models
+
       containers:
         - name: app
           image: docker.io/mipeda150/fedgrid-edge:latest
@@ -28,14 +40,20 @@ spec:
           envFrom: [ { configMapRef: { name: edge3-fog1-env } } ]
           volumeMounts:
             - { name: input, mountPath: /app/data/input_data.csv, subPath: input_data.csv }
+            - { name: models, mountPath: /app/models }
             - { name: host-sys, mountPath: /host_sys, readOnly: true }
           readinessProbe:
             tcpSocket: { port: 8081 }
             initialDelaySeconds: 10
             periodSeconds: 5
+
       volumes:
         - name: input
           persistentVolumeClaim: { claimName: edge3-fog1-input-pvc }
+        - name: models
+          hostPath:
+            path: /var/lib/fedgrid/edge3-fog1/models
+            type: DirectoryOrCreate
         - name: host-sys
           hostPath:
             path: /sys
@@ -49,4 +67,3 @@ metadata:
 spec:
   selector: { app: edge3-fog1 }
   ports: [ { name: http, port: 8081, targetPort: 8081 } ]
-
