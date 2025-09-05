@@ -28,7 +28,7 @@ spec:
             - { name: outbox, mountPath: /app/models/outbox }
       containers:
         - name: app
-          image: docker.io/mipeda150/fedgrid-fog:latest
+          image: docker.io/mipeda150/fedgrid-fog:v2025-09-05-1600
           ports: [ { containerPort: 8081 } ]
           envFrom: [ { configMapRef: { name: fog1-env } } ]
           volumeMounts:
