@@ -9,6 +9,10 @@ data:
   CLOUD_MQTT_HOST: mqtt.cloud.svc.cluster.local
   CLOUD_MQTT_PORT: "1883"
   APP_HOST_PORT: "8081"
+  DEV_PURGE_ON_BOOT: "true"
+  CLOUD_PURGE_AMQP_ON_BOOT: "true"
+  CLOUD_PURGE_MQTT_RETAINED_ON_BOOT: "true"
+  CLOUD_CLEAR_RETAINED_TOPICS: "cloud/fog/command,cloud/events/round-started"
 ---
 # PV for /app/models
 apiVersion: v1
