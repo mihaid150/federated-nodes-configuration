@@ -5,8 +5,8 @@ metadata:
   namespace: cloud
 data:
   # MQTT connection (agent subscribes/publishes on the cloud broker)
-  MQTT_HOST: mqtt.cloud.svc.cluster.local
-  MQTT_PORT: "1883"
+  CLOUD_MQTT_HOST: mqtt.cloud.svc.cluster.local
+  CLOUD_MQTT_PORT: "1883"
 
   # Topics the agent listens to / publishes
   TOPIC_ROUND_STARTED: cloud/events/round-started
