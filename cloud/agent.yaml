@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloud-agent
+  namespace: cloud
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: cloud-agent }
+  template:
+    metadata:
+      labels: { app: cloud-agent }
+    spec:
+      nodeSelector:
+        tier: cloud
+      imagePullSecrets:
+        - name: regcred             # reuse the same secret as cloud-app
+      containers:
+        - name: agent
+          image: docker.io/mipeda150/fedagents-cloud:v2025-09-06-2100
+          imagePullPolicy: IfNotPresent
+          # If your image already defines the entrypoint, drop the command/args
+          command: ["python"]
+          args: ["-m", "cloud.app_factory"]
+          envFrom:
+            - configMapRef: { name: cloud-agent-env }
+          # Optional health checks (simple: ensure process stays up)
+          livenessProbe:
+            exec:
+              command: [ "sh","-c","cat /proc/1/cmdline | tr -d '\\0' | grep -qi cloud.app_factory" ]
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command: [ "sh","-c","cat /proc/1/cmdline | tr -d '\\0' | grep -qi cloud.app_factory" ]
+            initialDelaySeconds: 10
+            periodSeconds: 5
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+

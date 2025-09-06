@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloud-agent-env
+  namespace: cloud
+data:
+  # MQTT connection (agent subscribes/publishes on the cloud broker)
+  MQTT_HOST: mqtt.cloud.svc.cluster.local
+  MQTT_PORT: "1883"
+
+  # Topics the agent listens to / publishes
+  TOPIC_ROUND_STARTED: cloud/events/round-started
+  TOPIC_FOG_MODEL_RECEIVED: cloud/events/fog-model-received
+  TOPIC_CLOUD_MODEL_BROADCAST: cloud/events/cloud-model-broadcast
+  TOPIC_AGENT_COMMANDS: cloud/agent/commands
+
+  # Bandit / policy defaults
+  BANDIT_ARMS: fog1,fog2
+  BANDIT_EPSILON: "0.1"
+  ORCH_DEFAULT_QUOTA: "0.2"
+  ORCH_DEFAULT_PRESSURE: "0.3"
+
+  # Logging
+  LOG_PREFIX: "[cloud-agent]"
+
