@@ -41,7 +41,7 @@ spec:
               mountPath: /app/models
       containers:
         - name: app
-          image: docker.io/mipeda150/fedgrid-edge:v2025-09-06-1620
+          image: docker.io/mipeda150/fedgrid-edge:v2025-09-06-1630
           ports: [ { containerPort: 8081 } ]
           envFrom: [ { configMapRef: { name: edge3-fog1-env } } ]
           volumeMounts:
