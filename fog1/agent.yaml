@@ -21,9 +21,11 @@ spec:
       containers:
         - name: agent
           # Mirror your cloud agent image naming; adjust tag as you publish
-          image: docker.io/mipeda150/fedagents-fog:v2025-09-07-1740
+          image: docker.io/mipeda150/fedagents-fog:v2025-09-07-1900
           imagePullPolicy: IfNotPresent
-
+          volumeMounts:
+            - name: dshm
+              mountPath: /dev/shm
           # If your image already sets the correct entrypoint, you can drop these.
           command: ["python"]
           args: ["-m", "fog.app_factory"]
@@ -51,4 +53,9 @@ spec:
             limits:
               cpu: "1"
               memory: "512Mi"
+      volumes:
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 1Gi
 

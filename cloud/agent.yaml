@@ -17,8 +17,11 @@ spec:
         - name: regcred             # reuse the same secret as cloud-app
       containers:
         - name: agent
-          image: docker.io/mipeda150/fedagents-cloud:v2025-09-07-1500
+          image: docker.io/mipeda150/fedagents-cloud:v2025-09-07-1900
           imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - mountPath: /dev/shm
+              name: dshm
           # If your image already defines the entrypoint, drop the command/args
           command: ["python"]
           args: ["-m", "cloud.app_factory"]
@@ -43,4 +46,9 @@ spec:
             limits:
               cpu: "1"
               memory: "512Mi"
+      volumes:
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 1Gi
 
