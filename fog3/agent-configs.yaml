@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fog-agent-env
+  namespace: fog3
+data:
+  # --- MQTT endpoints ---
+  # Primary (local) broker for the fog domain
+  FOG_MQTT_HOST: mqtt.fog3.svc.cluster.local
+  FOG_MQTT_PORT: "1883"
+
+  # Alias expected by shared libs
+  MQTT_HOST: mqtt.fog3.svc.cluster.local
+  MQTT_PORT: "1883"
+
+  # (Optional) Cloud broker if the agent bridges/listens upstream as well
+  CLOUD_MQTT_HOST: mqtt.cloud.svc.cluster.local
+  CLOUD_MQTT_PORT: "1883"
+
+  # --- AMQP endpoints (if your agent also talks to RabbitMQ) ---
+  FOG_RABBITMQ_HOST: rabbitmq.fog3.svc.cluster.local
+  CLOUD_RABBITMQ_HOST: rabbitmq.cloud.svc.cluster.local
+
+  # --- Topic wiring (fog scope) ---
+  # Incoming events (from edges → fog)
+  TOPIC_EDGE_MODEL_RECEIVED: fog3/events/edge-model-received
+  # Cloud → fog control/broadcast acknowledgements observed at fog
+  TOPIC_CLOUD_COMMAND_SEEN: fog3/events/cloud-command-seen
+  # Fog’s own model lifecycle events
+  TOPIC_FOG_MODEL_UPDATED: fog3/events/fog-model-updated
+  # Commands targeting this agent
+  TOPIC_AGENT_COMMANDS: fog3/agent/commands
+  # (Optional) publish when fog forwards model to cloud
+  TOPIC_FOG_MODEL_PUBLISHED: fog3/events/fog-model-published
+
+  # --- Policy/Bandit defaults (edges under this fog) ---
+  BANDIT_ARMS: edge1-fog3,edge2-fog3,edge3-fog3
+  BANDIT_EPSILON: "0.1"
+
+  # --- Orchestration heuristics (if used) ---
+  ORCH_DEFAULT_QUOTA: "0.3"
+  ORCH_DEFAULT_PRESSURE: "0.4"
+
+  # --- Behavior toggles (align with your fog app flags) ---
+  FOG_PURGE_AMQP_ON_BOOT: "true"
+  FOG_PURGE_EDGE_MODELS_ON_BOOT: "true"
+  FOG_PURGE_MQTT_RETAINED_ON_BOOT: "true"
+  FOG_IGNORE_CLOUD_RETAINED_SECS: "10"
+  FOG_MQTT_CLEAN_SESSION: "false"
+
+  # --- Logging ---
+  LOG_PREFIX: "[fog-agent][fog3]"
+

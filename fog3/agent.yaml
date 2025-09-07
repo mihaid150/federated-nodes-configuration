@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fog-agent
+  namespace: fog3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fog-agent
+  template:
+    metadata:
+      labels:
+        app: fog-agent
+    spec:
+      # Schedule onto the fog1 node(s) like your brokers
+      nodeSelector:
+        role: fog3
+      imagePullSecrets:
+        - name: regcred
+      containers:
+        - name: agent
+          # Mirror your cloud agent image naming; adjust tag as you publish
+          image: docker.io/mipeda150/fedagents-fog:v2025-09-07-1700
+          imagePullPolicy: IfNotPresent
+
+          # If your image already sets the correct entrypoint, you can drop these.
+          command: ["python"]
+          args: ["-m", "fog.app_factory"]
+
+          envFrom:
+            - configMapRef:
+                name: fog-agent-env
+
+          # Simple “is the right module running” exec probes
+          livenessProbe:
+            exec:
+              command: ["sh","-c","cat /proc/1/cmdline | tr -d '\\0' | grep -qi fog.app_factory"]
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command: ["sh","-c","cat /proc/1/cmdline | tr -d '\\0' | grep -qi fog.app_factory"]
+            initialDelaySeconds: 10
+            periodSeconds: 5
+
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "128Mi"
+            limits:
+              cpu: "1"
+              memory: "512Mi"
+
