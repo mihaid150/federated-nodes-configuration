@@ -17,7 +17,7 @@ spec:
         - name: regcred             # reuse the same secret as cloud-app
       containers:
         - name: agent
-          image: docker.io/mipeda150/fedagents-cloud:v2025-09-07-1100
+          image: docker.io/mipeda150/fedagents-cloud:v2025-09-07-1200
           imagePullPolicy: IfNotPresent
           # If your image already defines the entrypoint, drop the command/args
           command: ["python"]
