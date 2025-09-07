@@ -8,6 +8,9 @@ data:
   CLOUD_MQTT_HOST: mqtt.cloud.svc.cluster.local
   CLOUD_MQTT_PORT: "1883"
 
+  MQTT_HOST: mqtt.cloud.svc.cluster.local
+  MQTT_PORT: "1883"
+
   # Topics the agent listens to / publishes
   TOPIC_ROUND_STARTED: cloud/events/round-started
   TOPIC_FOG_MODEL_RECEIVED: cloud/events/fog-model-received
