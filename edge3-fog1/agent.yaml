@@ -12,7 +12,8 @@ spec:
       labels: { app: edge3-fog1-agent }
     spec:
       nodeSelector:
-        role: edge3-fog1
+        tier: cloud
+        logical-edge: edge3-fog1
       imagePullSecrets:
         - name: regcred
       volumes:
