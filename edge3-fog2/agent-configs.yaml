@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: edge3-fog2-agent-env
+  namespace: edge
+data:
+  # --- Identity (used to compose default topics) ---
+  EDGE_NAME: edge3_fog2
+
+  # --- MQTT (connects to the fog-local broker) ---
+  FOG_MQTT_HOST: mqtt.fog2.svc.cluster.local
+  FOG_MQTT_PORT: "1883"
+
+  # These are optional because edge_service.py will derive sensible defaults.
+  # Explicitly setting them keeps everything unambiguous.
+  MQTT_INPUT_TOPIC: node/edge3_fog2/telemetry
+  MQTT_OUTPUT_TOPIC: fog/agent/commands
+
+  # --- Policy thresholds for the sensing/forecaster loop (tune as needed) ---
+  POLICY_MAE_THRESHOLD: "0.12"
+  POLICY_REQUIRES_DRIFT: "true"

@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: edge3-fog2-agent
+  namespace: edge
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: edge3-fog2-agent }
+  template:
+    metadata:
+      labels: { app: edge3-fog2-agent }
+    spec:
+      nodeSelector:
+        role: edge3-fog2
+      imagePullSecrets:
+        - name: regcred
+      containers:
+        - name: agent
+          image: docker.io/mipeda150/fedagents-edge:v2025-09-08-1500
+          imagePullPolicy: IfNotPresent
+          command: ["python"]
+          args: ["-m", "edge.app_factory"]
+          envFrom:
+            - configMapRef: { name: edge3-fog2-agent-env }
+          ports:
+            - name: serve
+              containerPort: 8000
+          livenessProbe:
+            exec:
+              command: ["sh","-c","tr -d '\\0' </proc/1/cmdline | grep -qi edge.app_factory"]
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command: ["sh","-c","tr -d '\\0' </proc/1/cmdline | grep -qi edge.app_factory"]
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "128Mi"
+            limits:
+              cpu: "1"
+              memory: "512Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: edge3-fog2-agent
+  namespace: edge
+spec:
+  selector: { app: edge3-fog2-agent }
+  ports:
+    - name: http
+      port: 8000
+      targetPort: serve
+  type: ClusterIP
