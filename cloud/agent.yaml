@@ -17,7 +17,7 @@ spec:
         - name: regcred             # reuse the same secret as cloud-app
       containers:
         - name: agent
-          image: docker.io/mipeda150/fedagents-cloud:v2025-09-08-1500
+          image: docker.io/mipeda150/fedagents-cloud:v2025-09-08-1600
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /dev/shm
