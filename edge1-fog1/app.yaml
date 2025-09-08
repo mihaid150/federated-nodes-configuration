@@ -45,7 +45,7 @@ spec:
               mountPath: /app/models
       containers:
         - name: app
-          image: docker.io/mipeda150/fedgrid-edge:v2025-09-08-1400
+          image: docker.io/mipeda150/fedgrid-edge:v2025-09-08-1430
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8081
