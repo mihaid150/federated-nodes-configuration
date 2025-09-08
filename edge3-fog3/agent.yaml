@@ -15,6 +15,11 @@ spec:
         role: edge3-fog3
       imagePullSecrets:
         - name: regcred
+      volumes:
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 512Mi
       containers:
         - name: agent
           image: docker.io/mipeda150/fedagents-edge:v2025-09-08-1500
@@ -43,6 +48,9 @@ spec:
             limits:
               cpu: "1"
               memory: "512Mi"
+          volumeMounts:
+            - name: dshm
+              mountPath: /dev/shm
 ---
 apiVersion: v1
 kind: Service
