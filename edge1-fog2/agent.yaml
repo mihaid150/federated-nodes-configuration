@@ -19,10 +19,10 @@ spec:
         - name: dshm
           emptyDir:
             medium: Memory
-            sizeLimit: 512Mi
+            sizeLimit: 256Mi
       containers:
         - name: agent
-          image: docker.io/mipeda150/fedagents-edge:v2025-09-09-1200
+          image: docker.io/mipeda150/fedagents-edge:v2025-09-09-1300
           imagePullPolicy: IfNotPresent
           command: ["python"]
           args: ["-m", "edge.app_factory"]
@@ -44,10 +44,13 @@ spec:
           resources:
             requests:
               cpu: "200m"
-              memory: "256Mi"
+              memory: "384Mi"
             limits:
               cpu: "1"
-              memory: "768Mi"
+              memory: "1Gi"
+          env:
+            - name: RAY_memory_usage_threshold
+              value: "0.985"
           volumeMounts:
             - name: dshm
               mountPath: /dev/shm
