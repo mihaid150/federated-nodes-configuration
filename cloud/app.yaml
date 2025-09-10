@@ -17,7 +17,7 @@ spec:
         - name: regcred
       containers:
         - name: app
-          image: docker.io/mipeda150/fedgrid-cloud:v2025-09-08-1400
+          image: docker.io/mipeda150/fedgrid-cloud:v2025-09-10-1300
           ports:
             - containerPort: 8081
           envFrom:
