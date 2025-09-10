@@ -49,10 +49,10 @@ spec:
           resources:
             requests:
               cpu: "200m"
-              memory: "128Mi"
+              memory: "348Mi"
             limits:
               cpu: "1"
-              memory: "512Mi"
+              memory: "1Gi"
       volumes:
         - name: dshm
           emptyDir:

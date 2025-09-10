@@ -15,6 +15,11 @@ spec:
         tier: cloud
       imagePullSecrets:
         - name: regcred             # reuse the same secret as cloud-app
+      volumes:
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 1Gi
       containers:
         - name: agent
           image: docker.io/mipeda150/fedagents-cloud:v2025-09-10-1100
@@ -38,17 +43,10 @@ spec:
               command: [ "sh","-c","cat /proc/1/cmdline | tr -d '\\0' | grep -qi cloud.app_factory" ]
             initialDelaySeconds: 10
             periodSeconds: 5
-
           resources:
             requests:
               cpu: "200m"
-              memory: "128Mi"
+              memory: "348Mi"
             limits:
               cpu: "1"
-              memory: "512Mi"
-      volumes:
-        - name: dshm
-          emptyDir:
-            medium: Memory
-            sizeLimit: 1Gi
-
+              memory: "1Gi"
