@@ -26,7 +26,7 @@ data:
   TOPIC_AGENT_COMMANDS: fog/agent/commands
 
   # ---- Cloud → fog control (listen to your bridge topic) ----
-  TOPIC_CLOUD_TO_FOG_TARGETED: ""                  # leave empty until you move to targeted
+  TOPIC_CLOUD_TO_FOG_TARGETED: "cloud/agent/fog/fog3/commands"
   TOPIC_CLOUD_TO_FOG_BROADCAST: cloud/fog/command  # what your cloud bridge already uses
 
   # ---- Policy/Bandit defaults ----

@@ -11,10 +11,8 @@ data:
   FOG_MQTT_HOST: mqtt.fog3.svc.cluster.local
   FOG_MQTT_PORT: "1883"
 
-  # These are optional because edge_service.py will derive sensible defaults.
-  # Explicitly setting them keeps everything unambiguous.
   MQTT_INPUT_TOPIC: node/edge2_fog3/telemetry
-  MQTT_OUTPUT_TOPIC: fog/agent/commands
+  MQTT_OUTPUT_TOPIC: agent/edge2_fog3/commands
 
   # --- Policy thresholds for the sensing/forecaster loop (tune as needed) ---
   POLICY_MAE_THRESHOLD: "0.12"
