@@ -26,3 +26,5 @@ data:
   # Logging
   LOG_PREFIX: "[cloud-agent]"
 
+  BYPASS_CLOUD_APP_BRIDGE: "true"
+
