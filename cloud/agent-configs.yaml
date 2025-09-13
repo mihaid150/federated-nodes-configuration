@@ -14,7 +14,7 @@ data:
   # Topics the agent listens to / publishes
   TOPIC_ROUND_STARTED: cloud/events/round-started
   TOPIC_FOG_MODEL_RECEIVED: cloud/events/fog-model-received
-  TOPIC_CLOUD_MODEL_BROADCAST: cloud/events/cloud-model-broadcast
+  TOPIC_CLOUD_MODEL_DISPATCH: cloud/events/cloud-model-dispatch
   TOPIC_AGENT_COMMANDS: cloud/agent/commands
 
   # Bandit / policy defaults
