@@ -21,7 +21,7 @@ spec:
       containers:
         - name: agent
           # Mirror your cloud agent image naming; adjust tag as you publish
-          image: docker.io/mipeda150/fedagents-fog:v2025-09-13-1700
+          image: docker.io/mipeda150/fedagents-fog:v2025-09-13-1730
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - name: dshm
