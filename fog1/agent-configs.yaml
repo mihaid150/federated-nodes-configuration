@@ -35,6 +35,7 @@ data:
   BANDIT_EPSILON: "0.1"
   ORCH_DEFAULT_QUOTA: "0.3"
   ORCH_DEFAULT_PRESSURE: "0.4"
+  FOG_AGENT_SELECT_K: "2"
 
   # ---- Behavior toggles ----
   FOG_PURGE_AMQP_ON_BOOT: "true"
