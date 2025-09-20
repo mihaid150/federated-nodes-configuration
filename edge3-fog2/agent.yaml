@@ -22,7 +22,7 @@ spec:
             sizeLimit: 256Mi
       containers:
         - name: agent
-          image: docker.io/mipeda150/fedagents-edge:v2025-09-18-1400
+          image: docker.io/mipeda150/fedagents-edge:v2025-09-20-1200
           imagePullPolicy: IfNotPresent
           command: ["python"]
           args: ["-m", "edge.app_factory"]
