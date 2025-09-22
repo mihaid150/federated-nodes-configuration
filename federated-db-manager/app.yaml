@@ -1,0 +1,85 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: fdbm-app-secret
+  namespace: cloud
+type: Opaque
+data:
+  # DB_DSN = postgresql+psycopg2://fdbm:secret@fdbm-postgres.cloud.svc.cluster.local:5432/fdbm
+  DB_DSN: cG9zdGdyZXNxbCtwc3ljb3BnMjovL2ZkYm06c2VjcmV0QGZkYm0tcG9zdGdyZXMuY2xvdWQuc3ZjLmNsdXN0ZXIubG9jYWw6NTQzMi9mZGJt
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fdbm-app
+  namespace: cloud
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: fdbm-app }
+  template:
+    metadata:
+      labels: { app: fdbm-app }
+    spec:
+      nodeSelector:
+        tier: cloud
+      imagePullSecrets:
+        - name: regcred
+      containers:
+        - name: app
+          image: docker.io/mipeda150/fed-db-manager:v2025-09-22-1700
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef: { name: fdbm-env }
+            - secretRef: { name: fdbm-app-secret }
+          readinessProbe:
+            httpGet: { path: /healthz, port: 8080 }
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            httpGet: { path: /healthz, port: 8080 }
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fdbm-app
+  namespace: cloud
+spec:
+  selector:
+    app: fdbm-app
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fdbm
+  namespace: cloud
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: fdbm.local.lan
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: fdbm-app
+            port:
+              number: 8080
+

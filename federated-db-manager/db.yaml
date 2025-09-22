@@ -1,0 +1,83 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: fdbm-db-secret
+  namespace: cloud
+type: Opaque
+data:
+  POSTGRES_DB: ZmRibQ==            # fdbm
+  POSTGRES_USER: ZmRibQ==          # fdbm
+  POSTGRES_PASSWORD: c2VjcmV0      # secret (change in production)
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: fdbm-postgres-pvc
+  namespace: cloud
+spec:
+  accessModes: [ "ReadWriteOnce" ]
+  resources:
+    requests:
+      storage: 2Gi
+  storageClassName: local-path
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: fdbm-postgres
+  namespace: cloud
+spec:
+  serviceName: fdbm-postgres
+  replicas: 1
+  selector:
+    matchLabels: { app: fdbm-postgres }
+  template:
+    metadata:
+      labels: { app: fdbm-postgres }
+    spec:
+      nodeSelector:
+        tier: cloud
+      containers:
+        - name: postgres
+          image: timescale/timescaledb:2.14.2-pg14
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              valueFrom: { secretKeyRef: { name: fdbm-db-secret, key: POSTGRES_DB } }
+            - name: POSTGRES_USER
+              valueFrom: { secretKeyRef: { name: fdbm-db-secret, key: POSTGRES_USER } }
+            - name: POSTGRES_PASSWORD
+              valueFrom: { secretKeyRef: { name: fdbm-db-secret, key: POSTGRES_PASSWORD } }
+          readinessProbe:
+            tcpSocket: { port: 5432 }
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            tcpSocket: { port: 5432 }
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: fdbm-postgres-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fdbm-postgres
+  namespace: cloud
+spec:
+  selector:
+    app: fdbm-postgres
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432
+  type: ClusterIP
+
+
