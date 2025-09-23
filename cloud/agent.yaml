@@ -22,7 +22,7 @@ spec:
             sizeLimit: 1Gi
       containers:
         - name: agent
-          image: docker.io/mipeda150/fedagents-cloud:v2025-09-22-1620
+          image: docker.io/mipeda150/fedagents-cloud:v2025-09-23-2200
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /dev/shm
